@@ -28,73 +28,54 @@ def generate():
         abort(400, "Please provide both the list of numbers and n.")
 
     try:
-        list = parse_numbers(list_str)
+        numbers_list = parse_numbers(list_str)
         n = int(n_str)
         if n <= 0:
             raise ValueError
     except ValueError:
         abort(400, "Invalid input. Use integers only and n > 0.")
     
-    max_val = 0
-    for num in list:
-        if num > max_val:
-            max_val = num
-
-    min_val = list[0]
-    for num in list:
-        if num < min_val:
-            min_val = num
+    max_val = max(numbers_list)
+    min_val = min(numbers_list)
     
     amplitude = max_val - min_val
     while amplitude % n != 0:
         amplitude += 1
     
     range_val = amplitude/n
-    j = 0
     classes = []
 
-    while j < n:
+    for j in range(n):
         count = 0
-        numbers = (0, 0)
-        for num in list:
-            if num >= (min_val + j * range_val) and num < (min_val + (j + 1) * range_val):
+        lower = min_val + j * range_val
+        upper = min_val + (j + 1) * range_val
+        
+        for num in numbers_list:
+            if (num >= lower and num < upper) or (j == n-1 and num == upper):
                 count += 1
-                numbers = (min_val + j * range_val, min_val + (j + 1) * range_val)
-        if j == n - 1:
-            for num in list:
-                if num == (min_val + (j + 1) * range_val):
-                    count += 1
-                    numbers = (min_val + j * range_val, min_val + (j + 1) * range_val)
+        
+        classes.append(((lower, upper), count))
 
-        classes.append((numbers, count))
-        j += 1
-    i = 0
-    ExcelList = []
-    for group, count in classes:
-        i += 1
-        if(i < n):
-            ExcelList.append(f"[{group[0]}, {group[1]}[ {(count/len(list)*100)}%")
-        else:
-            ExcelList.append(f"[{group[0]}, {group[1]}] {(count/len(list)*100)}%")
-    
     wb = Workbook()
     ws = wb.active
-    ws.title = "Data"
-
-    for line in ExcelList:
-        ws.append(line)
+    ws.title = "Histogram"
+    
+    
+    for (lower, upper), count in classes:
+        class_range = f"[{lower}, {upper}]" if j == n-1 else f"[{lower}, {upper}["
+        percentage = f"{(count/len(numbers_list)*100):.2f}%"
+        ws.append([class_range, count, percentage])
 
     bio = BytesIO()
     wb.save(bio)
     bio.seek(0)
 
-    filename = f"numbers_{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}.xlsx"
+    filename = f"histogram_{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}.xlsx"
     return send_file(
         bio,
         as_attachment=True,
         download_name=filename,
-        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
 if __name__ == "__main__":
      app.run(debug=True)
