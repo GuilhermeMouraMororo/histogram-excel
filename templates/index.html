@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Números → Excel</title>
+  <title>Números → Histograma no Excel</title>
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; max-width: 680px; margin: 40px auto; padding: 0 16px; }
     form { display: grid; gap: 12px; }
@@ -14,15 +14,15 @@
   </style>
 </head>
 <body>
-  <h1>Números → Excel</h1>
-  <p>Entre uma lista de números inteiros aí tu vai receber um arquivo do excel contendo eles repetindo n vezes.</p>
+  <h1>Números → Histograma no Excel</h1>
+  <p>Entre uma lista de números, o número de classes, e receberá uma planilha do Excel contendo um histograma deles.</p>
 
   <form method="POST" action="/generate">
     <label for="numbers">Números (separados por vírgulas ou espaços)</label>
-    <textarea id="numbers" name="numbers" rows="3" placeholder="e.g. 4, 5, 6" required></textarea>
+    <textarea id="numbers" name="numbers" rows="3" placeholder="ex: 4, 5, 6" required></textarea>
 
-    <label for="n">Repetições (n)</label>
-    <input id="n" name="n" type="number" min="1" step="1" placeholder="e.g. 3" required />
+    <label for="n">Número de classes (n)</label>
+    <input id="n" name="n" type="number" min="1" step="1" placeholder="ex: 3" required />
 
     <button type="submit">Gerar arquivo do Excel</button>
   </form>
